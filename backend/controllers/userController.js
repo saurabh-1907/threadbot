@@ -71,14 +71,7 @@ const signupUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
 	try {
-		let { username, password } = req.body;
-
-		// Temporary workaround: Check for query parameter
-		if (req.query.user === "test1") {
-			// Hardcode the username and password for testing
-			username = "test1";
-			password = "test1"; // Use the actual password for the test1 user
-		}
+		const { username, password } = req.body;
 
 		const user = await User.findOne({ username });
 		const isPasswordCorrect = await bcrypt.compare(password, user?.password || "");
