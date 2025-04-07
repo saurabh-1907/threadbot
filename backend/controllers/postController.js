@@ -36,6 +36,41 @@ const createPost = async (req, res) => {
 		const newPost = new Post({ postedBy, text, img });
 		await newPost.save();
 
+		// 👇 Check if @threadbot is in the post
+		if (text.toLowerCase().includes("@threadbot")) {
+			const botUser = await User.findOne({ username: "threadBot" });
+			if (botUser) {
+				const prompt = `You are threadBot, a helpful assistant on a social media app. A user posted:\n"${text}". Reply back in short`;
+
+				const groqReply = await groq.chat.completions.create({
+					model: "qwen-2.5-32b",
+					messages: [{ role: "user", content: prompt }],
+					stream: true,
+					temperature: 0.6,
+					top_p: 0.95,
+					stop: null,
+					max_tokens: 4096,
+				});
+
+				let botText = "";
+				for await (const chunk of groqReply) {
+					botText += chunk.choices[0]?.delta?.content || "";
+				}
+
+				// Save reply from bot to this post
+				newPost.replies.push({
+					userId: botUser._id,
+					text: botText.trim(),
+					userProfilePic: botUser.profilePic,
+					username: botUser.username,
+				});
+
+				await newPost.save(); // Save again with the reply
+			} else {
+				console.log("threadBot user not found");
+			}
+		}
+
 		res.status(201).json(newPost);
 	} catch (err) {
 		res.status(500).json({ error: err.message });
@@ -126,33 +161,39 @@ const replyToPost = async (req, res) => {
 			return res.status(404).json({ error: "Post not found" });
 		}
 
-		// Add current user's reply
+		// Add user's reply to the post
 		const reply = { userId, text, userProfilePic, username };
 		post.replies.push(reply);
 
-		// Check if @threadBot is mentioned
+		// Check for @threadbot mention
 		if (text.toLowerCase().includes("@threadbot")) {
 			const botUser = await User.findOne({ username: "threadBot" });
-
 			if (!botUser) {
 				return res.status(500).json({ error: "threadBot user not found in DB" });
 			}
 
-			// Prepare prompt for Groq
-			const prompt = `You are a helpful bot named threadBot on a social app. A user replied to a post and said:\n"${text}". Reply back like a smart, friendly assistant.`;
+			const prompt = `You are threadBot, a smart, friendly assistant on a social app. A user replied:\n"${text}". Craft a short helpful reply as if you're responding in the same thread.`;
 
-			// Call Groq LLaMA3
 			const groqReply = await groq.chat.completions.create({
-				model: "llama3-70b-8192",
+				model: "qwen-2.5-32b",
 				messages: [{ role: "user", content: prompt }],
+				stream: true,
+				temperature: 0.6,
+				top_p: 0.95,
+				stop: null,
+				max_tokens: 4096,
 			});
 
-			const botText = groqReply.choices[0]?.message?.content || "Hey there! 👋 How can I help you today?";
+			// Collect streamed content
+			let botText = "";
+			for await (const chunk of groqReply) {
+				botText += chunk.choices[0]?.delta?.content || "";
+			}
 
-			// Add bot's reply
+			// Add threadBot's reply
 			post.replies.push({
 				userId: botUser._id,
-				text: botText,
+				text: botText.trim(),
 				userProfilePic: botUser.profilePic,
 				username: botUser.username,
 			});
@@ -165,6 +206,7 @@ const replyToPost = async (req, res) => {
 		res.status(500).json({ error: err.message });
 	}
 };
+
 const getFeedPosts = async (req, res) => {
 	try {
 		const userId = req.user._id;
