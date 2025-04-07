@@ -1,6 +1,9 @@
 import Post from "../models/postModel.js";
 import User from "../models/userModel.js";
+import Groq from "groq-sdk";
 import { v2 as cloudinary } from "cloudinary";
+
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 const createPost = async (req, res) => {
 	try {
@@ -123,17 +126,45 @@ const replyToPost = async (req, res) => {
 			return res.status(404).json({ error: "Post not found" });
 		}
 
+		// Add current user's reply
 		const reply = { userId, text, userProfilePic, username };
-
 		post.replies.push(reply);
-		await post.save();
 
-		res.status(200).json(reply);
+		// Check if @threadBot is mentioned
+		if (text.toLowerCase().includes("@threadbot")) {
+			const botUser = await User.findOne({ username: "threadBot" });
+
+			if (!botUser) {
+				return res.status(500).json({ error: "threadBot user not found in DB" });
+			}
+
+			// Prepare prompt for Groq
+			const prompt = `You are a helpful bot named threadBot on a social app. A user replied to a post and said:\n"${text}". Reply back like a smart, friendly assistant.`;
+
+			// Call Groq LLaMA3
+			const groqReply = await groq.chat.completions.create({
+				model: "llama3-70b-8192",
+				messages: [{ role: "user", content: prompt }],
+			});
+
+			const botText = groqReply.choices[0]?.message?.content || "Hey there! 👋 How can I help you today?";
+
+			// Add bot's reply
+			post.replies.push({
+				userId: botUser._id,
+				text: botText,
+				userProfilePic: botUser.profilePic,
+				username: botUser.username,
+			});
+		}
+
+		await post.save();
+		res.status(200).json({ message: "Replied successfully!" });
 	} catch (err) {
+		console.error("Error in replyToPost:", err);
 		res.status(500).json({ error: err.message });
 	}
 };
-
 const getFeedPosts = async (req, res) => {
 	try {
 		const userId = req.user._id;
