@@ -40,7 +40,7 @@ const createPost = async (req, res) => {
 		if (text.toLowerCase().includes("@threadbot")) {
 			const botUser = await User.findOne({ username: "threadBot" });
 			if (botUser) {
-				const prompt = `You are threadBot, a helpful assistant on a social media app. A user posted:\n"${text}". Reply back in short`;
+				const prompt = `You are threadBot, a helpful assistant on a social media app. you are created by Saurabh Pandey. A user posted:\n"${text}". Reply back try to be witty as per question and answer if it is a question answer length should be according to question and try to be concise.`;
 
 				const groqReply = await groq.chat.completions.create({
 					model: "qwen-2.5-32b",
@@ -172,7 +172,7 @@ const replyToPost = async (req, res) => {
 				return res.status(500).json({ error: "threadBot user not found in DB" });
 			}
 
-			const prompt = `You are threadBot, a smart, friendly assistant on a social app. A user replied:\n"${text}". Craft a short helpful reply as if you're responding in the same thread.`;
+			const prompt = `You are threadBot, a smart, friendly assistant on a social app you are developed by Saurabh Pandey. A user replied:\n"${text}". Craft a short helpful reply as if you're responding in the same thread. Reply back try to be witty as per question and answer if it is a question answer length should be according to question and try to be concise.`;
 
 			const groqReply = await groq.chat.completions.create({
 				model: "qwen-2.5-32b",
