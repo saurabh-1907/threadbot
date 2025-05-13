@@ -40,7 +40,7 @@ const createPost = async (req, res) => {
 		if (text.toLowerCase().includes("@threadbot")) {
 			const botUser = await User.findOne({ username: "threadBot" });
 			if (botUser) {
-				const prompt = `You are threadBot, a helpful assistant on a social media app. you are created by Yuvraj, Vansh and Priyanshu. A user posted:\n"${text}". Reply back try to be witty as per question and answer if it is a question answer length should be according to question and try to be concise.`;
+				const prompt = `You are threadBot, a helpful assistant on a social media app. you are created by Yuvraj, Vansh and Priyanshu. A user posted:\n"${text}". Reply back try to be witty  and keep it short in 3 - 5 line and keep just reply dont write additional details about user just reply as social media bot as per question and answer if it is a question answer length should be according to question and try to be concise.`;
 
 				const groqReply = await groq.chat.completions.create({
 					model: "qwen-qwq-32b",
