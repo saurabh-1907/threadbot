@@ -43,7 +43,7 @@ const createPost = async (req, res) => {
 				const prompt = `You are threadBot, a helpful assistant on a social media app. you are created by Yuvraj, Vansh and Priyanshu. A user posted:\n"${text}". Reply back try to be witty as per question and answer if it is a question answer length should be according to question and try to be concise.`;
 
 				const groqReply = await groq.chat.completions.create({
-					model: "qwen-2.5-32b",
+					model: "qwen-qwq-32b",
 					messages: [{ role: "user", content: prompt }],
 					stream: true,
 					temperature: 0.6,
