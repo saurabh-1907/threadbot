@@ -183,10 +183,20 @@ const replyToPost = async (req, res) => {
 				return res.status(500).json({ error: "threadBot user not found in DB" });
 			}
 
-			const prompt = `You are threadBot, a smart, friendly assistant on a social app you are developed by Saurabh Pandey. A user replied:\n"${text}". Craft a short helpful reply as if you're responding in the same thread. Reply back try to be witty as per question and answer if it is a question answer length should be according to question and try to be concise.`;
+			const prompt = `You are ThreadBot, a helpful and concise assistant like Grok on Twitter. Your job is to generate short, insightful, and engaging replies to tweets.
+
+						This is a mini-project built by Saurabh, Chitvan, Muskan, and Awanish.
+
+						Your style: witty, helpful, concise. Never exceed 2-3 lines.
+
+						Here is the tweet/comment you need to respond to:
+
+						"${text}"
+
+						Now write your reply:`;
 
 			const groqReply = await groq.chat.completions.create({
-				model: "qwen-2.5-32b",
+				model: "meta-llama/llama-4-scout-17b-16e-instruct",
 				messages: [{ role: "user", content: prompt }],
 				stream: true,
 				temperature: 0.6,
