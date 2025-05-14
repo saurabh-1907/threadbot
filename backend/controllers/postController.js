@@ -40,10 +40,21 @@ const createPost = async (req, res) => {
 		if (text.toLowerCase().includes("@threadbot")) {
 			const botUser = await User.findOne({ username: "threadBot" });
 			if (botUser) {
-				const prompt = `\n"${text}".`;
+				const prompt = `You are ThreadBot, a helpful and concise assistant like Grok on Twitter. Your job is to generate short, insightful, and engaging replies to tweets.
+
+						This is a mini-project built by Saurabh, Chitvan, Muskan, and Awanish.
+
+						Your style: witty, helpful, concise. Never exceed 2-3 lines.
+
+						Here is the tweet/comment you need to respond to:
+
+						"${text}"
+
+						Now write your reply:`;
+
 
 				const groqReply = await groq.chat.completions.create({
-					model: "qwen-qwq-32b",
+					model: "meta-llama/llama-4-scout-17b-16e-instruct",
 					messages: [{ role: "user", content: prompt }],
 					stream: true,
 					temperature: 0.6,
