@@ -50,7 +50,7 @@ const createPost = async (req, res) => {
 
 						"${text}"
 
-						Now write your reply:`;
+						Now write your reply: just write the reply and nothing else reply like the user`;
 
 
 				const groqReply = await groq.chat.completions.create({
