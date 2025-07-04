@@ -54,7 +54,7 @@ const createPost = async (req, res) => {
 
 
 				const groqReply = await groq.chat.completions.create({
-					model: "meta-llama/llama-4-scout-17b-16e-instruct",
+					model: "compound-beta",
 					messages: [{ role: "user", content: prompt }],
 					stream: true,
 					temperature: 0.6,
@@ -196,7 +196,7 @@ const replyToPost = async (req, res) => {
 						Now write your reply:`;
 
 			const groqReply = await groq.chat.completions.create({
-				model: "meta-llama/llama-4-scout-17b-16e-instruct",
+				model: "compound-beta",
 				messages: [{ role: "user", content: prompt }],
 				stream: true,
 				temperature: 0.6,
