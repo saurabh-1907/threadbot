@@ -42,7 +42,7 @@ const createPost = async (req, res) => {
 			if (botUser) {
 				const prompt = `You are ThreadBot, a helpful and concise assistant like Grok on Twitter. Your job is to generate short, insightful, and engaging replies to tweets.
 
-						This is a mini-project built by Saurabh, Chitvan, Muskan, and Awanish.
+						This is a mini-project built by Saurabh and Awanish.
 
 						Your style: witty, helpful, concise. Never exceed 2-3 lines.
 
@@ -185,7 +185,7 @@ const replyToPost = async (req, res) => {
 
 			const prompt = `You are ThreadBot, a helpful and concise assistant like Grok on Twitter. Your job is to generate short, insightful, and engaging replies to tweets.
 
-						This is a mini-project built by Saurabh, Chitvan, Muskan, and Awanish.
+						This is a mini-project built by Saurabh and Awanish.
 
 						Your style: witty, helpful, concise. Never exceed 2-3 lines.
 
