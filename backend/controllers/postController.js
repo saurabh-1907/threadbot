@@ -65,7 +65,7 @@ const createPost = async (req, res) => {
 
 				let botText = "";
 				for await (const chunk of groqReply) {
-					botText += chunk.choices[0]?.delta?.content || "";
+					botText = chunk.choices[0]?.delta?.content;
 				}
 
 				// Save reply from bot to this post
